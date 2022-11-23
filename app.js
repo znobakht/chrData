@@ -15,6 +15,9 @@ async function main() {
         const collections = await db.listCollections().toArray();
         // console.log(collections);
 
+        const unwantedNames = ['chr', 'locations', 'procedure1_cause2', 'timePicker', 'removed_empty_fields'];
+        collections = collections.filter(ele => !unwantedNames.includes(ele.name));
+
         let time = new Date();
         console.log(time.getMinutes())
 
@@ -25,10 +28,10 @@ async function main() {
                 { $project: { fieldName: `${collections[i].name}`, value: 1, name: 1, ts: 1, ProtocolCause: 1, 'Procedure identification': 1, _id: 0 } },
                 { $sort: { ProtocolCause: 1, 'Procedure identification': 1 }},
                 { $out: { db: tmpDB, coll: "aggr" } }
-            ]).toArray();
+            ], { "allowDiskUse": true }).toArray();
             let outputOfAggr = await client.db(tmpDB).collection("aggr").aggregate([
                 { $group: { _id: { ProtocolCause: "$ProtocolCause", ProcedureIdentification: "$Procedure identification" } } },
-            ]).toArray();
+            ], { "allowDiskUse": true }).toArray();
 
             const totalSize = await client.db(tmpDB).collection("aggr").count();
             console.log(totalSize);
@@ -43,7 +46,7 @@ async function main() {
                         }
                     },
                     { $merge: { into: { db: finalDB, coll: name }, whenMatched: "keepExisting" } }
-                ]).toArray()
+                ], { "allowDiskUse": true }).toArray()
 
             }
         }
