@@ -12,7 +12,7 @@ async function main() {
         console.log('connected to db');
 
         const db = client.db(dbName1);
-        const collections = await db.listCollections().toArray();
+        let collections = await db.listCollections().toArray();
         // console.log(collections);
 
         const unwantedNames = ['chr', 'locations', 'procedure1_cause2', 'timePicker', 'removed_empty_fields'];
