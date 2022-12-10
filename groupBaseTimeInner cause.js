@@ -12,7 +12,7 @@ async function main(){
     console.log('connected to db')
     const db = client.db(dbName);
     const colletion = db.collection(collectionName);
-    await colletion.aggregate([
+    const outs = await colletion.aggregate([
         {
             $match:{
             'Inner cause': 'Unknown'
@@ -31,11 +31,16 @@ async function main(){
                 "ts": { "$first": "$ts" },
                 "Inner cause": {"$first": "$Inner cause"}
             }
-        },
-        {
-            $out: { db: tmpDB, coll: "cache_Inner cause"}
         }
+        // ,{
+        //     $out: { db: tmpDB, coll: "cache_Inner cause"}
+        // }
     ]).toArray();
+
+    await colletion.deleteMany({"Inner cause": "Unknown"});
+    await colletion.insertMany(outs);
+
+    // console.log(outs);
 }
 
 
