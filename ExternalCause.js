@@ -45,15 +45,13 @@ async function main(){
                     { $project: { 
                         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"ExternalCause","ExternalCause":1,
                         StartTime:  { 
-                                $dateFromString: { dateString: "$StartTime", format: " %Y-%m-%d %H:%M:%S.%L",
-                                timezone: 'GMT', onError: "$StartTime"} 
+                                $dateFromString: { dateString: "$StartTime", format: " %Y-%m-%d %H:%M:%S.%L", onError: "$StartTime"} 
                             } 
                     }},
                     { $project: { 
                         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"ExternalCause","ExternalCause":1,
                         StartTime:  { 
-                                $dateFromString: { dateString: "$StartTime", format: " %Y-%m-%d %H:%M:%S",
-                                timezone: 'GMT', onError: "$StartTime"} 
+                                $dateFromString: { dateString: "$StartTime", format: " %Y-%m-%d %H:%M:%S", onError: "$StartTime"} 
                             } 
                     }},
                     { $project: { 
