@@ -56,7 +56,7 @@ async function main(){
                 }},
                 { $project: { 
                     ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"ExternalCause","ExternalCause":1,
-                    hour:{ $hour: "$StartTime" }
+                    year: { $year: "$StartTime" }, month:{ $month: "$StartTime" }, day:{$dayOfMonth: "$StartTime"},hour:{ $hour: "$StartTime" }
                 }},
                 {$group:{
                         _id:{
@@ -65,8 +65,7 @@ async function main(){
                             AccessType: "$AccessType",
                             ProtocolCause: "$ProtocolCause", 
                             ProcedureIdentification: "$Procedure identification",
-                            // year: { $year: "$StartTime" }, month:{ $month: "$StartTime" }, hour:{ $hour: "$StartTime" } 
-                            hour:"$hour" 
+                            year: "$year", month: "$month", day: "$day", hour:"$hour" 
                         },
                         // "ExternalCause":{ "$first":"$ExternalCause"},
                         "name":{ "$first":"$ExternalCause"},
@@ -76,15 +75,18 @@ async function main(){
                         // "AccessType": {"$first":"$AccessType"},
                         "fieldName":{"$first":"$fieldName"},
                         value: { "$sum": 1 },
+                        year:{"$first":"$year"},
+                        month:{"$first":"$month"},
+                        day:{"$first":"$day"},
                         hour:{"$first":"$hour"}
                     }
                 },
                 // {$sort:{ChrType :1, AccessType: 1, ProtocolCause: 1, ProcedureIdentification: 1, year: 1, month:1, day:1, hour:1, ExternalCause:1}},
                 // {$sort:{ "$_id.hour":1, ExternalCause:1}},didnt work
                     
-                    {$out:{
+                    {$merge:{ into:{
                         db: tmpDB, coll: collName
-                    }}
+                    }, whenMatched: "keepExisting"}}
             ]).toArray();
         }
             
