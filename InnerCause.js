@@ -3,7 +3,7 @@ const dbUrl = "mongodb://root:Password!123@192.168.238.10:27017";
 
 const dbNameTemplate = "2022120"
 
-const finalDB = 'newDBWithNewData';
+const finalDB = 'newDBWithNewData1';
 
 let client;
 async function main(){
@@ -55,7 +55,7 @@ async function main(){
                             } 
                     }},
                     { $project: { 
-                        ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"Inner cause","Inner cause":1,
+                        ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"Inner cause","Inner cause":1, "StartTime":1,
                         year: { $year: "$StartTime" }, month:{ $month: "$StartTime" }, day:{$dayOfMonth: "$StartTime"},hour:{ $hour: "$StartTime" }
                     }},
                     {$group:{
@@ -73,7 +73,8 @@ async function main(){
                             year:{"$first":"$year"},
                             month:{"$first":"$month"},
                             day:{"$first":"$day"},
-                            hour:{"$first":"$hour"}
+                            hour:{"$first":"$hour"},
+                            "StartTime":{"$first":"$StartTime"}
                         }
                     },
                         
