@@ -3,7 +3,7 @@ const dbUrl = "mongodb://root:Password!123@192.168.238.10:27017";
 
 const dbNameTemplate = "2022120"
 
-const finalDB = 'newDBWithNewData';
+const finalDB = 'newDBWithNewData1';
 
 let client;
 async function main(){
@@ -29,7 +29,7 @@ async function main(){
                         },
                     }
                 },
-            ]).toArray();
+            ], { "allowDiskUse": true }).toArray();
     
             for(let i =0; i<forNameOfCollections.length; i++){
                 const collName = `ESKZA_${forNameOfCollections[i]._id.ChrType}_${forNameOfCollections[i]._id.AccessType}_${forNameOfCollections[i]._id.ProcedureIdentification}_${forNameOfCollections[i]._id.ProtocolCause}`
@@ -55,12 +55,12 @@ async function main(){
                             } 
                     }},
                     { $project: { 
-                        ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"ExternalCause","ExternalCause":1,
+                        ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"ExternalCause","ExternalCause":1, "StartTime":1,
                         year: { $year: "$StartTime" }, month:{ $month: "$StartTime" }, day:{$dayOfMonth: "$StartTime"},hour:{ $hour: "$StartTime" }
                     }},
                     {$group:{
                             _id:{
-                                ExternalCause:"$ExternalCause",
+                                "ExternalCause":"$ExternalCause",
                                 ChrType :"$ChrType",
                                 AccessType: "$AccessType",
                                 ProtocolCause: "$ProtocolCause", 
@@ -73,14 +73,15 @@ async function main(){
                             year:{"$first":"$year"},
                             month:{"$first":"$month"},
                             day:{"$first":"$day"},
-                            hour:{"$first":"$hour"}
+                            hour:{"$first":"$hour"},
+                            "ts":{"$first":"$StartTime"}
                         }
                     },
                         
                     {$merge:{ into:{
                         db: finalDB, coll: collName
                     }, whenMatched: "keepExisting"}}
-                ]).toArray();
+                ], { "allowDiskUse": true }).toArray();
             }
         }
         
