@@ -74,7 +74,7 @@ async function main(){
                             month:{"$first":"$month"},
                             day:{"$first":"$day"},
                             hour:{"$first":"$hour"},
-                            "StartTime":{"$first":"$StartTime"}
+                            "ts":{"$first":"$StartTime"}
                         }
                     },
                         
