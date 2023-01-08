@@ -12,7 +12,7 @@ async function main(){
         client = await mongoClient.connect(dbUrl);
         console.log("connected to db");
 
-        for(let i =5; i<6; i++){
+        for(let i =5; i<8; i++){
         // for(let i =5; i<8; i++){
             console.log(new Date().getHours());
             console.log(new Date().getMinutes());
@@ -32,9 +32,11 @@ async function main(){
                     }
                 },
             ], { "allowDiskUse": true }).toArray();
+            console.log(forNameOfCollections.length)
     
-            // for(let i =0; i<forNameOfCollections.length; i++){
-            for(let i =0; i<1; i++){
+            for(let i =0; i<forNameOfCollections.length; i++){
+            // for(let i =0; i<1; i++){
+                console.log(i)
                 const collName = `ESKZA_${forNameOfCollections[i]._id.ChrType}_${forNameOfCollections[i]._id.AccessType}_${forNameOfCollections[i]._id.ProcedureIdentification}_${forNameOfCollections[i]._id.ProtocolCause}`
                 await collection.aggregate([
                     {
