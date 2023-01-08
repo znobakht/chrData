@@ -12,8 +12,8 @@ async function main(){
         client = await mongoClient.connect(dbUrl);
         console.log("connected to db");
 
+        // for(let i =5; i<6; i++){
         for(let i =5; i<8; i++){
-        // for(let i =5; i<8; i++){
             console.log(new Date().getHours());
             console.log(new Date().getMinutes());
             console.log(i)
@@ -70,9 +70,9 @@ async function main(){
                         year: { $year: "$StartTime" }, month:{ $month: "$StartTime" }, day:{$dayOfMonth: "$StartTime"},hour:{ $hour: "$StartTime" }
                     }},
                         
-                    {$merge:{ into:{
+                    {$out:{ 
                         db: finalDB, coll: tmpCollectionName
-                    }, whenMatched: "keepExisting"}}
+                    }}
                 ], { "allowDiskUse": true }).toArray();
 
                 console.log("second stage")
@@ -4707,6 +4707,7 @@ async function main(){
 // console.log(new Date().getHours());
 // console.log(new Date().getMinutes());
 main()
+    .then(()=>console.log(new Date().getHours()))
     .then(()=>console.log(new Date().getMinutes()))
     .catch(err=>{
         console.log(new Date().getMinutes());
