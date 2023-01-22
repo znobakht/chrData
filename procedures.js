@@ -66,7 +66,32 @@ async function main() {
                 ProcedureIdentification: {
                   $first: "$Procedure identification",
                 },
+                ts: { $first: "$StartTime" },
                 count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                // _id: 0,
+                count: 1,
+                ProcedureIdentification: 1,
+                withHour: {
+                  $dateToString: { format: "%Y-%m-%d %H", date: "$ts" },
+                },
+                ts: 1,
+              },
+            },
+            {
+              $project: {
+                ProcedureIdentification: 1,
+                count: 1,
+                ts: {
+                  $dateFromString: {
+                    dateString: "$withHour",
+                    format: "%Y-%m-%d %H",
+                    onError: "$ts",
+                  },
+                },
               },
             },
             {
