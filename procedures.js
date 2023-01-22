@@ -49,10 +49,10 @@ async function main() {
               $project: {
                 "Procedure identification": 1,
                 StartTime: 1,
-                year: { $year: $StartTime },
-                month: { $month: $StartTime },
-                day: { $dayOfMonth: $StartTime },
-                hour: { $hour: $StartTime },
+                year: { $year: "$StartTime" },
+                month: { $month: "$StartTime" },
+                day: { $dayOfMonth: "$StartTime" },
+                hour: { $hour: "$StartTime" },
               },
             },
             {
