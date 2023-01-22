@@ -2,7 +2,8 @@ const mongoClient = require("mongodb").MongoClient;
 const mongoURL = require("./config/keys").mongoURL;
 
 const srcDbNameTmp = "2022120";
-const destDbName = "ProceduresCount";
+const destDbName = "filters";
+const destCollectionName = "ProceduresCount";
 
 const collectionName = "chr";
 
@@ -98,7 +99,7 @@ async function main() {
               $merge: {
                 into: {
                   db: destDbName,
-                  coll: destDbName,
+                  coll: destCollectionName,
                 },
                 whenMatched: "keepExisting",
               },
