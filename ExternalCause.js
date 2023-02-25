@@ -1,5 +1,5 @@
-const mongoClient = require("mongodb").MongoClient;
-const dbUrl = "mongodb://root:Password!123@192.168.238.10:27017";
+import { MongoClient } from "mongodb";
+import { mongoURL } from "./config/keys.js";
 
 const dbNameTemplate = "2022120";
 
@@ -8,7 +8,7 @@ const finalDB = "newDBWithNewData1";
 let client;
 async function main() {
   try {
-    client = await mongoClient.connect(dbUrl);
+    client = await MongoClient.connect(mongoURL);
     console.log("connected to db");
 
     for (let i = 5; i < 8; i++) {

@@ -1,5 +1,5 @@
-const mongoClient = require("mongodb").MongoClient;
-const mongoURL = require("./config/keys").mongoURL;
+import { MongoClient } from "mongodb";
+import { mongoURL } from "./config/keys.js";
 
 const srcDbNameTmp = "2022120";
 const destDbName = "filters";
@@ -12,7 +12,7 @@ const collectionName = "chr";
 let client;
 async function main() {
   try {
-    client = await mongoClient.connect(mongoURL);
+    client = await MongoClient.connect(mongoURL);
     console.log("connected to mongodb server");
 
     for (let i = 5; i < 8; i++) {
