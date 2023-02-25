@@ -1,10 +1,13 @@
 import { MongoClient } from "mongodb";
-import { mongoURL } from "./config/keys.js";
+import {
+  mongoURL,
+  dbNameTemplate,
+  finalDB,
+  tmpCollectionName,
+} from "./config/keys.js";
 
-const dbNameTemplate = "2022120";
-
-const finalDB = "newDBWithNewData11";
-const tmpCollectionName = "tmpColl";
+import { printTime } from "./printTime.js";
+import logger from "./logger.js";
 
 let client;
 async function main() {
@@ -13,12 +16,12 @@ async function main() {
     console.log("connected to db");
 
     // for(let i =5; i<6; i++){
-    for (let i = 5; i < 8; i++) {
-      console.log(new Date().getHours());
-      console.log(new Date().getMinutes());
-      console.log(i);
+    for (let j = 5; j < 8; j++) {
+      printTime();
+      console.log(j);
+      logger.info(`fileNumber: ${j}`);
 
-      let dbName = `${dbNameTemplate}${i}`;
+      let dbName = `${dbNameTemplate}${j}`;
       const collection = client.db(dbName).collection("chr");
 
       const forNameOfCollections = await collection
@@ -39,10 +42,12 @@ async function main() {
         )
         .toArray();
       console.log(forNameOfCollections.length);
+      logger.info(`num of collctions ${forNameOfCollections.length}`);
 
       for (let i = 0; i < forNameOfCollections.length; i++) {
         // for(let i =0; i<1; i++){
         console.log(i);
+        logger.info(`collction Number: ${i}`);
         const collName = `ESKZA_${forNameOfCollections[i]._id.ChrType}_${forNameOfCollections[i]._id.AccessType}_${forNameOfCollections[i]._id.ProcedureIdentification}_${forNameOfCollections[i]._id.ProtocolCause}`;
         await collection
           .aggregate(
@@ -58,68 +63,6 @@ async function main() {
               },
               {
                 $project: {
-                  // ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "Inner cause":1,
-                  // ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"Inner cause","Inner cause":1,
-                  IMSI: 1,
-                  AccessType: 1,
-                  "Procedure identification": 1,
-                  ProtocolCause: 1,
-                  ExternalCause: 1,
-                  "Inner cause": 1,
-                  "APN In Used": 1,
-                  "APN NI": 1,
-                  "APN NI in used": 1,
-                  "APN Request by MS": 1,
-                  "Authentication Flag": 1,
-                  "Bearer ID": 1,
-                  BSSID: 1,
-                  ChrType: 1,
-                  CI: 1,
-                  "CUR TAC": 1,
-                  DelayTime: 1,
-                  "eNB ID": 1,
-                  "EPS attach result": 1,
-                  "GGSN Address for signalling": 1,
-                  "GGSN Address for user traffic": 1,
-                  "Handover Cancel Phase": 1,
-                  "IMEI check Flag": 1,
-                  IMEISV: 1,
-                  "Init proc cause": 1,
-                  "Internal Physical Location": 1,
-                  LAC: 1,
-                  "Message Type": 1,
-                  MSISDN: 1,
-                  "New GUTI MMEC": 1,
-                  "New GUTI MMEGI": 1,
-                  "Old GUTI MMEC": 1,
-                  "Old GUTI MMEGI": 1,
-                  "Old LAC": 1,
-                  "Old RAC": 1,
-                  "Old TAC": 1,
-                  "PDN Address in used": 1,
-                  "PDN Gateway Address": 1,
-                  "PDN Type": 1,
-                  "PDP address in use": 1,
-                  "PDP type in used": 1,
-                  "PDP type request by MS": 1,
-                  "Peer SGSN Address": 1,
-                  QCI: 1,
-                  RAC: 1,
-                  "RNC ID": 1,
-                  "S1-U eNodeB Address1": 1,
-                  "S1-U Serving Gateway Address1": 1,
-                  "Serving Gateway Address": 1,
-                  "SGS RePaging Count": 1,
-                  "SGW Change Flag": 1,
-                  "SRVCC Cause": 1,
-                  "SRVCC Preparation Period": 1,
-                  "State MachineName": 1,
-                  "Target RNC ID": 1,
-                  "Target TAC": 1,
-                  "Traffic Class": 1,
-                  "User Home PLMN": 1,
-                  "VLR No_": 1,
-                  "Voice domain preference and UE's usage setting": 1,
                   StartTime: {
                     $dateFromString: {
                       dateString: "$StartTime",
@@ -127,12 +70,6 @@ async function main() {
                       onError: "$StartTime",
                     },
                   },
-                },
-              },
-              {
-                $project: {
-                  // ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "Inner cause":1,
-                  // ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, fieldName:"Inner cause","Inner cause":1,
                   IMSI: 1,
                   AccessType: 1,
                   "Procedure identification": 1,
@@ -193,6 +130,10 @@ async function main() {
                   "User Home PLMN": 1,
                   "VLR No_": 1,
                   "Voice domain preference and UE's usage setting": 1,
+                },
+              },
+              {
+                $project: {
                   StartTime: {
                     $dateFromString: {
                       dateString: "$StartTime",
@@ -200,11 +141,6 @@ async function main() {
                       onError: "$StartTime",
                     },
                   },
-                },
-              },
-              {
-                $project: {
-                  // ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "Inner cause":1,
                   IMSI: 1,
                   AccessType: 1,
                   "Procedure identification": 1,
@@ -265,11 +201,75 @@ async function main() {
                   "User Home PLMN": 1,
                   "VLR No_": 1,
                   "Voice domain preference and UE's usage setting": 1,
+                },
+              },
+              {
+                $project: {
                   StartTime: 1,
                   year: { $year: "$StartTime" },
                   month: { $month: "$StartTime" },
                   day: { $dayOfMonth: "$StartTime" },
                   hour: { $hour: "$StartTime" },
+                  IMSI: 1,
+                  AccessType: 1,
+                  "Procedure identification": 1,
+                  ProtocolCause: 1,
+                  ExternalCause: 1,
+                  "Inner cause": 1,
+                  "APN In Used": 1,
+                  "APN NI": 1,
+                  "APN NI in used": 1,
+                  "APN Request by MS": 1,
+                  "Authentication Flag": 1,
+                  "Bearer ID": 1,
+                  BSSID: 1,
+                  ChrType: 1,
+                  CI: 1,
+                  "CUR TAC": 1,
+                  DelayTime: 1,
+                  "eNB ID": 1,
+                  "EPS attach result": 1,
+                  "GGSN Address for signalling": 1,
+                  "GGSN Address for user traffic": 1,
+                  "Handover Cancel Phase": 1,
+                  "IMEI check Flag": 1,
+                  IMEISV: 1,
+                  "Init proc cause": 1,
+                  "Internal Physical Location": 1,
+                  LAC: 1,
+                  "Message Type": 1,
+                  MSISDN: 1,
+                  "New GUTI MMEC": 1,
+                  "New GUTI MMEGI": 1,
+                  "Old GUTI MMEC": 1,
+                  "Old GUTI MMEGI": 1,
+                  "Old LAC": 1,
+                  "Old RAC": 1,
+                  "Old TAC": 1,
+                  "PDN Address in used": 1,
+                  "PDN Gateway Address": 1,
+                  "PDN Type": 1,
+                  "PDP address in use": 1,
+                  "PDP type in used": 1,
+                  "PDP type request by MS": 1,
+                  "Peer SGSN Address": 1,
+                  QCI: 1,
+                  RAC: 1,
+                  "RNC ID": 1,
+                  "S1-U eNodeB Address1": 1,
+                  "S1-U Serving Gateway Address1": 1,
+                  "Serving Gateway Address": 1,
+                  "SGS RePaging Count": 1,
+                  "SGW Change Flag": 1,
+                  "SRVCC Cause": 1,
+                  "SRVCC Preparation Period": 1,
+                  "State MachineName": 1,
+                  "Target RNC ID": 1,
+                  "Target TAC": 1,
+                  "Traffic Class": 1,
+                  "User Home PLMN": 1,
+                  "VLR No_": 1,
+                  "Voice domain preference and UE's usage setting": 1,
                 },
               },
 
@@ -285,320 +285,9 @@ async function main() {
           .toArray();
 
         console.log("second stage");
+        logger.info("second stage");
 
         const tmpCollection = client.db(finalDB).collection(tmpCollectionName);
-        // await tmpCollection.aggregate([
-        //         { $project: {
-        //             ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "Inner cause":1, "StartTime":1,fieldName:"Inner cause",
-        //             year: 1, month:1, day:1,hour:1
-        //         }},
-        //         {$group:{
-        //             _id:{
-        //                 "Inner cause":"$Inner cause",
-        //                 ChrType :"$ChrType",
-        //                 AccessType: "$AccessType",
-        //                 ProtocolCause: "$ProtocolCause",
-        //                 ProcedureIdentification: "$Procedure identification",
-        //                 year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //             },
-        //             "value":{ "$first":"$Inner cause"},
-        //             "fieldName":{ "$first":"$fieldName"},
-        //             count: { "$sum": 1 },
-        //             "ts":{"$first":"$StartTime"}
-        //         }
-        //     },
-        //     {$project:{
-        //         _id:0,
-        //         "value":1,
-        //             "fieldName":1,
-        //             count: 1,
-        //         withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //         ts:1
-        //     }},
-        //     {$project:{
-        //         "value":1,
-        //             "fieldName":1,
-        //             count: 1,
-        //         ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        //     }},
-
-        //     {$merge:{ into:{
-        //         db: finalDB, coll: collName
-        //     }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "APN In Used":1, "StartTime":1,fieldName:"APN In Used",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "APN In Used":"$APN In Used",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$APN In Used"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "APN NI":1, "StartTime":1,fieldName:"APN NI",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "APN NI":"$APN NI",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$APN NI"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "IMSI":1, "StartTime":1,fieldName:"IMSI",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "IMSI":"$IMSI",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$IMSI"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "ExternalCause":1, "StartTime":1,fieldName:"ExternalCause",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "ExternalCause":"$ExternalCause",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$ExternalCause"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "APN NI in used":1, "StartTime":1,fieldName:"APN NI in used",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "APN NI in used":"$APN NI in used",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$APN NI in used"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "APN Request by MS":1, "StartTime":1,fieldName:"APN Request by MS",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "APN Request by MS":"$APN Request by MS",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$APN Request by MS"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
-        // await tmpCollection.aggregate([
-        //     { $project: {
-        //         ChrType :1, AccessType: 1, ProtocolCause: 1, "Procedure identification": 1, "Authentication Flag":1, "StartTime":1,fieldName:"Authentication Flag",
-        //         year: 1, month:1, day:1,hour:1
-        //     }},
-        //     {$group:{
-        //         _id:{
-        //             "Authentication Flag":"$Authentication Flag",
-        //             ChrType :"$ChrType",
-        //             AccessType: "$AccessType",
-        //             ProtocolCause: "$ProtocolCause",
-        //             ProcedureIdentification: "$Procedure identification",
-        //             year: "$year", month: "$month", day: "$day", hour:"$hour"
-        //         },
-        //         "value":{ "$first":"$Authentication Flag"},
-        //         "fieldName":{ "$first":"$fieldName"},
-        //         count: { "$sum": 1 },
-        //         "ts":{"$first":"$StartTime"}
-        //     }
-        // },
-        // {$project:{
-        //     _id:0,
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     withHour:{ $dateToString: { format: "%Y-%m-%d %H", date: "$ts" } },
-        //     ts:1
-        // }},
-        // {$project:{
-        //     "value":1,
-        //         "fieldName":1,
-        //         count: 1,
-        //     ts:{ $dateFromString: { dateString: "$withHour", format: "%Y-%m-%d %H", onError: "$ts"}  },
-        // }},
-
-        // {$merge:{ into:{
-        //     db: finalDB, coll: collName
-        // }, whenMatched: "keepExisting"}}
-        // ], { "allowDiskUse": true }).toArray();
 
         await tmpCollection
           .aggregate(
@@ -9441,12 +9130,9 @@ async function main() {
   }
 }
 
-// console.log(new Date().getHours());
-// console.log(new Date().getMinutes());
 main()
-  .then(() => console.log(new Date().getHours()))
-  .then(() => console.log(new Date().getMinutes()))
+  .then(() => printTime())
   .catch((err) => {
-    console.log(new Date().getMinutes());
+    printTime();
     console.error(err);
   });
