@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { mongoURL } from "./config/keys.js";
+import { mongoURL } from "../config/keys.js";
 
 const dbName1 = "20220628";
 const tmpDB = "tmpDB";
