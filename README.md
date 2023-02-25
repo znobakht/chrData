@@ -13,4 +13,6 @@ tmpCollectionName: a temporary collection name
   
  3- run both changes files for make int values to wanted names.
  
- 4- run filter file for creation of filters in grafana
+ 4- run procedures file for creating 2 collection for procedures and protocol based procedures
+ 
+ 5- run filter file for creation of filters in grafana
