@@ -1,6 +1,5 @@
 import { MongoClient } from "mongodb";
-import { mongoURL } from "./config/keys.js";
-const dbNameTemplate = "2022120";
+import { mongoURL, dbNameTemplate } from "./config/keys.js";
 
 const ProcedureToUnknownFields = [
   "02",
