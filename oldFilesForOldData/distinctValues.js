@@ -1,5 +1,5 @@
 import { MongoClient } from "mongodb";
-import { mongoURL } from "./config/keys.js";
+import { mongoURL } from "../config/keys.js";
 const dbNameTemplate = "2022120";
 let totalATS = [];
 let totalPIS = [];
